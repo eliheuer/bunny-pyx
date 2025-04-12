@@ -16,6 +16,9 @@ TOOL_RECT = 5
 TOOL_CIRCLE = 6
 TOOL_CLEAR = 7
 
+# Number of tools in toolbar
+NUM_TOOLS = 8
+
 # Brush sizes
 SIZES = [1, 2, 4, 8]
 
@@ -55,13 +58,13 @@ class BunnyPyx:
                     self.current_color = col
             # Tool selection (top row of toolbar)
             elif pyxel.mouse_y > toolbar_y and pyxel.mouse_y < toolbar_y + 16:
-                col = pyxel.mouse_x // 32
-                if 0 <= col < 8:
+                col = pyxel.mouse_x // 16
+                if 0 <= col < NUM_TOOLS:
                     self.current_tool = col
                     
                 # Size selection (right side)
-                size_idx = (pyxel.mouse_x - 200) // 16
-                if 200 <= pyxel.mouse_x < 256 and 0 <= size_idx < len(SIZES):
+                size_idx = (pyxel.mouse_x - (256 - len(SIZES)*16)) // 16
+                if (256 - len(SIZES)*16) <= pyxel.mouse_x < 256 and 0 <= size_idx < len(SIZES):
                     self.current_size = SIZES[size_idx]
                 
                 # Clear canvas if clear tool selected
@@ -165,35 +168,27 @@ class BunnyPyx:
         toolbar_y = 160 - TOOLBAR_HEIGHT  # Position at bottom of window
         pyxel.rect(0, toolbar_y, CANVAS_WIDTH, TOOLBAR_HEIGHT, 13)
         
-        # Draw tool buttons
-        tool_icons = [
-            (0, 0, "Pencil"),      # Pencil
-            (32, 0, "Brush"),      # Brush
-            (64, 0, "Eraser"),     # Eraser
-            (96, 0, "Fill"),       # Fill
-            (128, 0, "Line"),      # Line
-            (160, 0, "Rect"),      # Rectangle
-            (192, 0, "Circ"),      # Circle
-            (224, 0, "Clear")      # Clear
-        ]
-        
-        for i, (x, _, name) in enumerate(tool_icons):
+        # Draw tool icons (16x16 each)
+        for i in range(NUM_TOOLS):
+            x = i * 16
+            y = toolbar_y
+            
             # Highlight selected tool
             highlight = 7 if i == self.current_tool else 0
-            pyxel.rectb(x, toolbar_y, 32, 16, highlight)
+            pyxel.rectb(x, y, 16, 16, highlight)
             
-            # Draw tool name
-            pyxel.text(x + 4, toolbar_y + 6, name, 7)
+            # Draw the icon from sprite sheet (image 0)
+            pyxel.blt(x, y, 0, i * 16, 0, 16, 16, 0)
         
         # Draw brush size selectors
         for i, size in enumerate(SIZES):
-            x = 200 + i * 16
+            x = 256 - (len(SIZES) - i) * 16
             y = toolbar_y
             selected = 7 if size == self.current_size else 0
             pyxel.rectb(x, y, 16, 16, selected)
             pyxel.circ(x + 8, y + 8, size // 2, 7)
         
-        # Draw color palette (using 16x16 squares instead of 16x32 rectangles)
+        # Draw color palette (using 16x16 squares)
         for i in range(16):
             x = i * 16
             y = toolbar_y + 16
