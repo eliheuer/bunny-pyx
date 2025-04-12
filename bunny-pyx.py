@@ -3,8 +3,8 @@ import pyxel
 
 #pyxel.init(256, 178, fullscreen=True)
 CANVAS_WIDTH = 256
-CANVAS_HEIGHT = 112  # Reduced to make room for toolbar
-TOOLBAR_HEIGHT = 32  # Reduced toolbar height for more canvas space
+CANVAS_HEIGHT = 128  # Increased to use more of the 160px height
+TOOLBAR_HEIGHT = 32  # Toolbar at the bottom
 
 # Tool constants
 TOOL_PENCIL = 0
@@ -44,15 +44,17 @@ class BunnyPyx:
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
             
+        toolbar_y = 160 - TOOLBAR_HEIGHT  # Position at bottom of window
+            
         # Toolbar interaction
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             # Color selection (bottom row)
-            if pyxel.mouse_y > CANVAS_HEIGHT + 16 and pyxel.mouse_y < CANVAS_HEIGHT + 32:
+            if pyxel.mouse_y > toolbar_y + 16 and pyxel.mouse_y < toolbar_y + 32:
                 col = pyxel.mouse_x // 16
                 if 0 <= col < 16:
                     self.current_color = col
             # Tool selection (top row of toolbar)
-            elif pyxel.mouse_y > CANVAS_HEIGHT and pyxel.mouse_y < CANVAS_HEIGHT + 16:
+            elif pyxel.mouse_y > toolbar_y and pyxel.mouse_y < toolbar_y + 16:
                 col = pyxel.mouse_x // 32
                 if 0 <= col < 8:
                     self.current_tool = col
@@ -160,7 +162,8 @@ class BunnyPyx:
         pyxel.blt(0, 0, 1, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
         
         # Draw toolbar background
-        pyxel.rect(0, CANVAS_HEIGHT, CANVAS_WIDTH, TOOLBAR_HEIGHT, 13)
+        toolbar_y = 160 - TOOLBAR_HEIGHT  # Position at bottom of window
+        pyxel.rect(0, toolbar_y, CANVAS_WIDTH, TOOLBAR_HEIGHT, 13)
         
         # Draw tool buttons
         tool_icons = [
@@ -177,15 +180,15 @@ class BunnyPyx:
         for i, (x, _, name) in enumerate(tool_icons):
             # Highlight selected tool
             highlight = 7 if i == self.current_tool else 0
-            pyxel.rectb(x, CANVAS_HEIGHT, 32, 16, highlight)
+            pyxel.rectb(x, toolbar_y, 32, 16, highlight)
             
             # Draw tool name
-            pyxel.text(x + 4, CANVAS_HEIGHT + 6, name, 7)
+            pyxel.text(x + 4, toolbar_y + 6, name, 7)
         
         # Draw brush size selectors
         for i, size in enumerate(SIZES):
             x = 200 + i * 16
-            y = CANVAS_HEIGHT
+            y = toolbar_y
             selected = 7 if size == self.current_size else 0
             pyxel.rectb(x, y, 16, 16, selected)
             pyxel.circ(x + 8, y + 8, size // 2, 7)
@@ -193,7 +196,7 @@ class BunnyPyx:
         # Draw color palette (using 16x16 squares instead of 16x32 rectangles)
         for i in range(16):
             x = i * 16
-            y = CANVAS_HEIGHT + 16
+            y = toolbar_y + 16
             pyxel.rect(x, y, 16, 16, i)
             
             # Highlight selected color
