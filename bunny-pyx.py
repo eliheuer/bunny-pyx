@@ -25,6 +25,7 @@ SIZES = [1, 2, 4, 8]
 class BunnyPyx:
     def __init__(self):
         pyxel.init(256, 160, title="Bunny Pyx")
+        pyxel.load("assets/bunny-pyx.pyxres")
         pyxel.mouse(True)
         
         # Initialize canvas
