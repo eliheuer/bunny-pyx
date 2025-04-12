@@ -1,10 +1,10 @@
+# Bunny Pyx
 import pyxel
 
-
-#pyxel.init(256, 178, fullscreen=True)
+# Woskspace constants
 CANVAS_WIDTH = 256
-CANVAS_HEIGHT = 128  # Increased to use more of the 160px height
-TOOLBAR_HEIGHT = 32  # Toolbar at the bottom
+CANVAS_HEIGHT = 128
+TOOLBAR_HEIGHT = 32
 
 # Tool constants
 TOOL_PENCIL = 0
