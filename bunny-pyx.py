@@ -4,7 +4,7 @@ import pyxel
 #pyxel.init(256, 178, fullscreen=True)
 CANVAS_WIDTH = 256
 CANVAS_HEIGHT = 112  # Reduced to make room for toolbar
-TOOLBAR_HEIGHT = 48  # Increased toolbar height
+TOOLBAR_HEIGHT = 32  # Reduced toolbar height for more canvas space
 
 # Tool constants
 TOOL_PENCIL = 0
@@ -47,12 +47,12 @@ class BunnyPyx:
         # Toolbar interaction
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             # Color selection (bottom row)
-            if pyxel.mouse_y > CANVAS_HEIGHT + 16:
+            if pyxel.mouse_y > CANVAS_HEIGHT + 16 and pyxel.mouse_y < CANVAS_HEIGHT + 32:
                 col = pyxel.mouse_x // 16
                 if 0 <= col < 16:
                     self.current_color = col
             # Tool selection (top row of toolbar)
-            elif pyxel.mouse_y > CANVAS_HEIGHT:
+            elif pyxel.mouse_y > CANVAS_HEIGHT and pyxel.mouse_y < CANVAS_HEIGHT + 16:
                 col = pyxel.mouse_x // 32
                 if 0 <= col < 8:
                     self.current_tool = col
@@ -190,15 +190,15 @@ class BunnyPyx:
             pyxel.rectb(x, y, 16, 16, selected)
             pyxel.circ(x + 8, y + 8, size // 2, 7)
         
-        # Draw color palette
+        # Draw color palette (using 16x16 squares instead of 16x32 rectangles)
         for i in range(16):
             x = i * 16
             y = CANVAS_HEIGHT + 16
-            pyxel.rect(x, y, 16, 32, i)
+            pyxel.rect(x, y, 16, 16, i)
             
             # Highlight selected color
             if i == self.current_color:
-                pyxel.rectb(x, y, 16, 32, 7)
+                pyxel.rectb(x, y, 16, 16, 7)
                 
         # Preview for shape tools
         if self.drawing and pyxel.mouse_y < CANVAS_HEIGHT:
