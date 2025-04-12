@@ -175,8 +175,8 @@ class BunnyPyx:
             y = toolbar_y
             
             # Highlight selected tool
-            highlight = 7 if i == self.current_tool else 0
-            pyxel.rectb(x, y, 16, 16, highlight)
+            if i == self.current_tool:
+                pyxel.rectb(x, y, 16, 16, 7)
             
             # Draw the icon from sprite sheet (image 0)
             pyxel.blt(x, y, 0, i * 16, 0, 16, 16, 0)
@@ -185,8 +185,11 @@ class BunnyPyx:
         for i, size in enumerate(SIZES):
             x = 256 - (len(SIZES) - i) * 16
             y = toolbar_y
-            selected = 7 if size == self.current_size else 0
-            pyxel.rectb(x, y, 16, 16, selected)
+            
+            # Only highlight the selected size
+            if size == self.current_size:
+                pyxel.rectb(x, y, 16, 16, 7)
+                
             pyxel.circ(x + 8, y + 8, size // 2, 7)
         
         # Draw color palette (using 16x16 squares)
