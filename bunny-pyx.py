@@ -3,8 +3,8 @@ import pyxel
 
 #pyxel.init(256, 178, fullscreen=True)
 CANVAS_WIDTH = 256
-CANVAS_HEIGHT = 160
-TOOLBAR_HEIGHT = 32
+CANVAS_HEIGHT = 112  # Reduced to make room for toolbar
+TOOLBAR_HEIGHT = 48  # Increased toolbar height
 
 # Tool constants
 TOOL_PENCIL = 0
@@ -21,7 +21,7 @@ SIZES = [1, 2, 4, 8]
 
 class BunnyPyx:
     def __init__(self):
-        pyxel.init(CANVAS_WIDTH, CANVAS_HEIGHT, title="Bunny Pyx")
+        pyxel.init(256, 160, title="Bunny Pyx")
         pyxel.mouse(True)
         
         # Initialize canvas
@@ -47,7 +47,7 @@ class BunnyPyx:
         # Toolbar interaction
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             # Color selection (bottom row)
-            if pyxel.mouse_y > CANVAS_HEIGHT + 32:
+            if pyxel.mouse_y > CANVAS_HEIGHT + 16:
                 col = pyxel.mouse_x // 16
                 if 0 <= col < 16:
                     self.current_color = col
@@ -177,22 +177,23 @@ class BunnyPyx:
         for i, (x, _, name) in enumerate(tool_icons):
             # Highlight selected tool
             highlight = 7 if i == self.current_tool else 0
-            pyxel.rectb(x, CANVAS_HEIGHT, 32, 32, highlight)
+            pyxel.rectb(x, CANVAS_HEIGHT, 32, 16, highlight)
             
             # Draw tool name
-            pyxel.text(x + 4, CANVAS_HEIGHT + 12, name, 7)
+            pyxel.text(x + 4, CANVAS_HEIGHT + 6, name, 7)
         
         # Draw brush size selectors
         for i, size in enumerate(SIZES):
             x = 200 + i * 16
+            y = CANVAS_HEIGHT
             selected = 7 if size == self.current_size else 0
-            pyxel.rectb(x, CANVAS_HEIGHT, 16, 16, selected)
-            pyxel.circ(x + 8, CANVAS_HEIGHT + 8, size // 2, 7)
+            pyxel.rectb(x, y, 16, 16, selected)
+            pyxel.circ(x + 8, y + 8, size // 2, 7)
         
         # Draw color palette
         for i in range(16):
             x = i * 16
-            y = CANVAS_HEIGHT + 32
+            y = CANVAS_HEIGHT + 16
             pyxel.rect(x, y, 16, 32, i)
             
             # Highlight selected color
