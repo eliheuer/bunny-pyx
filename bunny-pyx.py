@@ -6,6 +6,7 @@ CANVAS_WIDTH = 256
 CANVAS_HEIGHT = 128
 TOOLBAR_HEIGHT = 32
 
+
 # Tool constants
 TOOL_PENCIL = 0
 TOOL_BRUSH = 1
@@ -192,16 +193,18 @@ class BunnyPyx:
                 
             pyxel.circ(x + 8, y + 8, size // 2, 7)
         
-        # Draw color palette (using 16x16 squares)
+        # Draw color palette (using 14x14 color samples with 1px outline)
         for i in range(16):
             x = i * 16
             y = toolbar_y + 16
-            pyxel.rect(x, y, 16, 16, i)
             
-            # Highlight selected color
-            if i == self.current_color:
-                pyxel.rectb(x, y, 16, 16, 7)
-                
+            # Draw border (black by default, white if selected)
+            outline_color = 7 if i == self.current_color else 0
+            pyxel.rectb(x + 1, y + 1, 14, 14, outline_color)
+            
+            # Draw color sample (14x14)
+            pyxel.rect(x + 2, y + 2, 12, 12, i)
+        
         # Preview for shape tools
         if self.drawing and pyxel.mouse_y < CANVAS_HEIGHT:
             if self.current_tool == TOOL_LINE:
