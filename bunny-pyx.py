@@ -21,7 +21,7 @@ TOOL_CLEAR = 7
 NUM_TOOLS = 8
 
 # Brush sizes
-SIZES = [1, 2, 4, 8]
+SIZES = [1, 3, 6, 12]
 
 class BunnyPyx:
     def __init__(self):
@@ -175,23 +175,40 @@ class BunnyPyx:
             x = i * 16
             y = toolbar_y
             
-            # Highlight selected tool
+            # Highlight selected tool with 15x15 indicator
             if i == self.current_tool:
-                pyxel.rectb(x, y, 16, 16, 7)
+                pyxel.rectb(x + 1, y + 1, 14, 14, 7)
             
             # Draw the icon from sprite sheet (image 0)
             pyxel.blt(x, y, 0, i * 16, 0, 16, 16, 0)
         
         # Draw brush size selectors
         for i, size in enumerate(SIZES):
+            # Calculate the base position for this brush size selector (top-left corner)
             x = 256 - (len(SIZES) - i) * 16
             y = toolbar_y
             
-            # Only highlight the selected size
+            # Calculate the center of the 16x16 area
+            center_x = x + 8
+            center_y = y + 8
+            
+            # Only highlight the selected size with 15x15 indicator
             if size == self.current_size:
-                pyxel.rectb(x, y, 16, 16, 7)
-                
-            pyxel.circ(x + 8, y + 8, size // 2, 7)
+                # Draw selection box (15x15)
+                pyxel.rectb(x + 1, y + 1, 14, 14, 7)
+            
+            # Make sure circles are perfectly centered within the 15x15 selection box
+            # For a circle with radius r, the diameter is 2r+1 pixels
+            # The selection box is 15x15, so the max diameter should be 13 (leaving 1px on each side)
+            # Therefore max radius is 6 (for a 13 pixel diameter)
+            display_sizes = [1, 2, 4, 6]  # Adjusted for perfect centering
+            display_size = display_sizes[i]
+            
+            # Draw filled circle with current color (perfectly centered)
+            pyxel.circ(center_x, center_y, display_size, self.current_color)
+            
+            # Draw black outline around the circle
+            pyxel.circb(center_x, center_y, display_size, 0)
         
         # Draw color palette (using 14x14 color samples with 1px outline)
         for i in range(16):
