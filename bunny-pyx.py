@@ -9,16 +9,17 @@ TOOLBAR_HEIGHT = 32
 
 # Tool constants
 TOOL_PENCIL = 0
-TOOL_BRUSH = 1
+TOOL_BRUSH  = 1
 TOOL_ERASER = 2
-TOOL_FILL = 3
-TOOL_LINE = 4
-TOOL_RECT = 5
+TOOL_FILL   = 3
+TOOL_LINE   = 4
+TOOL_RECT   = 5
 TOOL_CIRCLE = 6
-TOOL_CLEAR = 7
+TOOL_CLEAR  = 7
+TOOL_STAMP  = 8
 
 # Number of tools in toolbar
-NUM_TOOLS = 8
+NUM_TOOLS = 9  # Updated to include stamp tool
 
 # Brush sizes
 SIZES = [1, 3, 6, 12]
@@ -34,6 +35,25 @@ COLOR_PALETTES = [
     
     # Layer 3: Grayscale (using default Pyxel colors for now)
     [0, 0, 5, 5, 6, 6, 7, 7, 7, 6, 6, 5, 5, 0]
+]
+
+# Stamp images
+# Array of (x, y) coordinates for the stamps in the resource file
+STAMPS = [
+    (0, 0),    # Pencil icon
+    (16, 0),   # Brush icon
+    (32, 0),   # Eraser icon
+    (48, 0),   # Fill icon
+    (64, 0),   # Line icon
+    (80, 0),   # Rectangle icon
+    (96, 0),   # Circle icon
+    (112, 0),  # Clear icon
+    (128, 0),  # Stamp icon
+    (144, 0),  # Will be additional stamps
+    (160, 0),
+    (176, 0),
+    (192, 0),
+    (208, 0)
 ]
 
 class BunnyPyx:
@@ -56,6 +76,10 @@ class BunnyPyx:
         self.current_palette = 0
         self.num_palettes = len(COLOR_PALETTES)
         
+        # Initialize stamp
+        self.current_stamp = 0
+        self.num_stamps = len(STAMPS)
+        
         # Create a second image for the canvas
         pyxel.image(1).cls(0)
         
@@ -70,19 +94,34 @@ class BunnyPyx:
             
         # Toolbar interaction
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-            # Color palette row interaction
+            # Color/Stamp palette row interaction
             if pyxel.mouse_y > toolbar_y + 16 and pyxel.mouse_y < toolbar_y + 32:
-                # Left arrow button (first position)
-                if 0 <= pyxel.mouse_x < 16:
-                    self.current_palette = (self.current_palette - 1) % self.num_palettes
-                # Right arrow button (last position)
-                elif 240 <= pyxel.mouse_x < 256:
-                    self.current_palette = (self.current_palette + 1) % self.num_palettes
-                # Color selection (positions 1-14)
+                if self.current_tool == TOOL_STAMP:
+                    # Stamp selection mode
+                    # Left arrow button (first position)
+                    if 0 <= pyxel.mouse_x < 16:
+                        self.current_stamp = (self.current_stamp - 1) % self.num_stamps
+                    # Right arrow button (last position)
+                    elif 240 <= pyxel.mouse_x < 256:
+                        self.current_stamp = (self.current_stamp + 1) % self.num_stamps
+                    # Stamp selection (positions 1-14)
+                    else:
+                        stamp_idx = (pyxel.mouse_x - 16) // 16
+                        if 0 <= stamp_idx < 14:  # Only 14 visible stamps at once
+                            self.current_stamp = stamp_idx
                 else:
-                    col_idx = (pyxel.mouse_x - 16) // 16
-                    if 0 <= col_idx < 14:
-                        self.current_color = COLOR_PALETTES[self.current_palette][col_idx]
+                    # Color selection mode
+                    # Left arrow button (first position)
+                    if 0 <= pyxel.mouse_x < 16:
+                        self.current_palette = (self.current_palette - 1) % self.num_palettes
+                    # Right arrow button (last position)
+                    elif 240 <= pyxel.mouse_x < 256:
+                        self.current_palette = (self.current_palette + 1) % self.num_palettes
+                    # Color selection (positions 1-14)
+                    else:
+                        col_idx = (pyxel.mouse_x - 16) // 16
+                        if 0 <= col_idx < 14:
+                            self.current_color = COLOR_PALETTES[self.current_palette][col_idx]
             
             # Tool selection (top row of toolbar)
             elif pyxel.mouse_y > toolbar_y and pyxel.mouse_y < toolbar_y + 16:
@@ -112,8 +151,12 @@ class BunnyPyx:
                     self.draw_point(pyxel.mouse_x, pyxel.mouse_y)
                 
                 # Fill bucket tool
-                if self.current_tool == TOOL_FILL:
+                elif self.current_tool == TOOL_FILL:
                     pyxel.image(1).cls(self.current_color)
+                
+                # Stamp tool - stamp immediately
+                elif self.current_tool == TOOL_STAMP:
+                    self.stamp_image(pyxel.mouse_x, pyxel.mouse_y)
             
             # Continue drawing
             elif pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.drawing:
@@ -138,6 +181,10 @@ class BunnyPyx:
                                         pyxel.mouse_x + dx, pyxel.mouse_y + dy,
                                         color
                                     )
+                elif self.current_tool == TOOL_STAMP:
+                    # Allow continuous stamping while dragging
+                    if pyxel.frame_count % 8 == 0:  # Limit stamping rate to avoid too many stamps
+                        self.stamp_image(pyxel.mouse_x, pyxel.mouse_y)
             
             # End drawing
             elif pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT) and self.drawing:
@@ -185,6 +232,17 @@ class BunnyPyx:
                 size, 
                 color
             )
+    
+    def stamp_image(self, x, y):
+        # Get stamp coordinates
+        sx, sy = STAMPS[self.current_stamp]
+        
+        # Center the stamp on the mouse position
+        dest_x = x - 8
+        dest_y = y - 8
+        
+        # Copy the stamp to the canvas with transparency (color 0)
+        pyxel.image(1).blt(dest_x, dest_y, 0, sx, sy, 16, 16, 0)
         
     def draw(self):
         pyxel.cls(5)  # Background color
@@ -236,8 +294,11 @@ class BunnyPyx:
             # Draw black outline around the circle
             pyxel.circb(center_x, center_y, display_size, 0)
         
-        # Draw color palette navigation and colors
-        self.draw_color_palette(toolbar_y + 16)
+        # Draw either color palette or stamp palette based on current tool
+        if self.current_tool == TOOL_STAMP:
+            self.draw_stamp_palette(toolbar_y + 16)
+        else:
+            self.draw_color_palette(toolbar_y + 16)
                 
         # Preview for shape tools
         if self.drawing and pyxel.mouse_y < CANVAS_HEIGHT:
@@ -263,6 +324,10 @@ class BunnyPyx:
                 x2, y2 = pyxel.mouse_x, pyxel.mouse_y
                 radius = int(((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5)
                 pyxel.circb(x1, y1, radius, self.current_color)
+            elif self.current_tool == TOOL_STAMP:
+                # Show stamp preview at cursor position
+                sx, sy = STAMPS[self.current_stamp]
+                pyxel.blt(pyxel.mouse_x - 8, pyxel.mouse_y - 8, 0, sx, sy, 16, 16, 0)
                 
     def draw_color_palette(self, y):
         # Draw left arrow button
@@ -294,5 +359,32 @@ class BunnyPyx:
             
             # Draw color sample (14x14)
             pyxel.rect(x + 2, y + 2, 12, 12, color)
+    
+    def draw_stamp_palette(self, y):
+        # Draw left arrow button
+        pyxel.rectb(1, y + 1, 14, 14, 0)  # Black outline
+        pyxel.line(10, y + 8, 5, y + 8, 7)  # Arrow horizontal
+        pyxel.line(5, y + 8, 8, y + 5, 7)   # Arrow top
+        pyxel.line(5, y + 8, 8, y + 11, 7)  # Arrow bottom
+        
+        # Draw right arrow button
+        pyxel.rectb(241, y + 1, 14, 14, 0)  # Black outline
+        pyxel.line(246, y + 8, 251, y + 8, 7)  # Arrow horizontal
+        pyxel.line(251, y + 8, 248, y + 5, 7)   # Arrow top
+        pyxel.line(251, y + 8, 248, y + 11, 7)  # Arrow bottom
+        
+        # Draw stamps between the arrows
+        for i in range(14):  # Show 14 stamps at a time
+            stamp_idx = i
+            if stamp_idx < len(STAMPS):
+                x = 16 + i * 16
+                sx, sy = STAMPS[stamp_idx]
+                
+                # Draw border (white if selected)
+                outline_color = 7 if stamp_idx == self.current_stamp else 0
+                pyxel.rectb(x + 1, y + 1, 14, 14, outline_color)
+                
+                # Draw stamp
+                pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
 
 BunnyPyx() 
