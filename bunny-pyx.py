@@ -195,10 +195,8 @@ class BunnyPyx:
                                         color,
                                     )
                 elif self.current_tool == TOOL_STAMP:
-                    # Allow continuous stamping while dragging
-                    if (
-                        pyxel.frame_count % 8 == 0
-                    ):  # Limit stamping rate to avoid too many stamps
+                    # Allow continuous stamping while dragging, with minimal delay
+                    if pyxel.frame_count % 2 == 0:  # Reduced from 8 to 2 frames
                         self.stamp_image(pyxel.mouse_x, pyxel.mouse_y)
 
             # End drawing
