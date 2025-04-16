@@ -645,9 +645,9 @@ class BunnyPyx:
                 x = 16 + i * 16
                 sx, sy = STAMPS[stamp_idx]
 
-                # Draw border (white if selected)
-                outline_color = 7 if stamp_idx == self.current_stamp else 0
-                pyxel.rectb(x + 1, y + 1, 14, 14, outline_color)
+                # Draw white outline only if selected, no outline for unselected stamps
+                if stamp_idx == self.current_stamp:
+                    pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
 
                 # Draw stamp
                 pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
@@ -672,9 +672,9 @@ class BunnyPyx:
             # For now, we're using temporary icons from the same resource file
             sx, sy = ALGO_BRUSH_ICONS[i]
 
-            # Draw border (white if selected)
-            outline_color = 7 if i == self.current_algo_brush else 0
-            pyxel.rectb(x + 1, y + 1, 14, 14, outline_color)
+            # Draw white outline only if selected, no outline for unselected brushes
+            if i == self.current_algo_brush:
+                pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
 
             # Draw brush icon
             pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
