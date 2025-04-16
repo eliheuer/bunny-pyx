@@ -20,9 +20,11 @@ TOOL_CIRCLE = 6
 TOOL_CLEAR = 7
 TOOL_STAMP = 8
 TOOL_ALGO_BRUSH = 9
+TOOL_TYPE = 10
+TOOL_FILTER = 11
 
 # Number of tools in toolbar
-NUM_TOOLS = 10
+NUM_TOOLS = 12
 
 # Brush sizes
 SIZES = [1, 3, 6, 12]
@@ -595,17 +597,11 @@ class BunnyPyx:
                 self.draw_algo_brush_preview(pyxel.mouse_x, pyxel.mouse_y)
 
     def draw_color_palette(self, y):
-        # Draw left arrow button
-        pyxel.rectb(1, y + 1, 14, 14, 0)  # Black outline
-        pyxel.line(10, y + 8, 5, y + 8, 7)  # Arrow horizontal
-        pyxel.line(5, y + 8, 8, y + 5, 7)  # Arrow top
-        pyxel.line(5, y + 8, 8, y + 11, 7)  # Arrow bottom
+        # Draw left arrow button using icon
+        pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
 
-        # Draw right arrow button
-        pyxel.rectb(241, y + 1, 14, 14, 0)  # Black outline
-        pyxel.line(246, y + 8, 251, y + 8, 7)  # Arrow horizontal
-        pyxel.line(251, y + 8, 248, y + 5, 7)  # Arrow top
-        pyxel.line(251, y + 8, 248, y + 11, 7)  # Arrow bottom
+        # Draw right arrow button using icon
+        pyxel.blt(240, y, 0, 208, 0, 16, 16, 0)  # Right arrow icon at (208,0)
 
         # Draw palette layer indicator (small dots at the bottom)
         for i in range(self.num_palettes):
@@ -626,17 +622,11 @@ class BunnyPyx:
             pyxel.rect(x + 2, y + 2, 12, 12, color)
 
     def draw_stamp_palette(self, y):
-        # Draw left arrow button
-        pyxel.rectb(1, y + 1, 14, 14, 0)  # Black outline
-        pyxel.line(10, y + 8, 5, y + 8, 7)  # Arrow horizontal
-        pyxel.line(5, y + 8, 8, y + 5, 7)  # Arrow top
-        pyxel.line(5, y + 8, 8, y + 11, 7)  # Arrow bottom
+        # Draw left arrow button using icon
+        pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
 
-        # Draw right arrow button
-        pyxel.rectb(241, y + 1, 14, 14, 0)  # Black outline
-        pyxel.line(246, y + 8, 251, y + 8, 7)  # Arrow horizontal
-        pyxel.line(251, y + 8, 248, y + 5, 7)  # Arrow top
-        pyxel.line(251, y + 8, 248, y + 11, 7)  # Arrow bottom
+        # Draw right arrow button using icon
+        pyxel.blt(240, y, 0, 208, 0, 16, 16, 0)  # Right arrow icon at (208,0)
 
         # Draw stamps between the arrows
         for i in range(14):  # Show 14 stamps at a time
@@ -653,17 +643,11 @@ class BunnyPyx:
                 pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
 
     def draw_algo_brush_palette(self, y):
-        # Draw left arrow button
-        pyxel.rectb(1, y + 1, 14, 14, 0)  # Black outline
-        pyxel.line(10, y + 8, 5, y + 8, 7)  # Arrow horizontal
-        pyxel.line(5, y + 8, 8, y + 5, 7)  # Arrow top
-        pyxel.line(5, y + 8, 8, y + 11, 7)  # Arrow bottom
+        # Draw left arrow button using icon
+        pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
 
-        # Draw right arrow button
-        pyxel.rectb(241, y + 1, 14, 14, 0)  # Black outline
-        pyxel.line(246, y + 8, 251, y + 8, 7)  # Arrow horizontal
-        pyxel.line(251, y + 8, 248, y + 5, 7)  # Arrow top
-        pyxel.line(251, y + 8, 248, y + 11, 7)  # Arrow bottom
+        # Draw right arrow button using icon
+        pyxel.blt(240, y, 0, 208, 0, 16, 16, 0)  # Right arrow icon at (208,0)
 
         # Draw algorithmic brush icons between the arrows
         for i in range(min(14, self.num_algo_brushes)):
