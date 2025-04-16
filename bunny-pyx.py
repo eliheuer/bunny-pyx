@@ -83,6 +83,92 @@ ALGO_BRUSH_ICONS = [
     (0, 16),   # Waves
 ]
 
+# Character icons for the type tool
+# These are placeholder coordinates for now
+# Will be replaced with actual character graphics
+CHARS = [
+    # Latin uppercase alphabet
+    (0, 48),  # A
+    (16, 48),  # B
+    (32, 48),  # C
+    (48, 48),  # D
+    (64, 48),  # E
+    (80, 32),  # F
+    (96, 32),  # G
+    (112, 32),  # H
+    (128, 32),  # I
+    (144, 32),  # J
+    (160, 32),  # K
+    (176, 32),  # L
+    (192, 32),  # M
+    (208, 32),  # N
+    (224, 32),  # O
+    (240, 32),  # P
+    (0, 48),  # Q
+    (16, 48),  # R
+    (32, 48),  # S
+    (48, 48),  # T
+    (64, 48),  # U
+    (80, 48),  # V
+    (96, 48),  # W
+    (112, 48),  # X
+    (128, 48),  # Y
+    (144, 48),  # Z
+    
+    # Numbers
+    (160, 48),  # 0
+    (176, 48),  # 1
+    (192, 48),  # 2
+    (208, 48),  # 3
+    (224, 48),  # 4
+    (240, 48),  # 5
+    (0, 64),  # 6
+    (16, 64),  # 7
+    (32, 64),  # 8
+    (48, 64),  # 9
+    
+    # Symbols
+    (64, 64),  # .
+    (80, 64),  # ,
+    (96, 64),  # !
+    (112, 64),  # ?
+    (128, 64),  # :
+    (144, 64),  # ;
+    (160, 64),  # (
+    (176, 64),  # )
+    (192, 64),  # [
+    (208, 64),  # ]
+    (224, 64),  # {
+    (240, 64),  # }
+    (0, 80),  # +
+    (16, 80),  # -
+    (32, 80),  # *
+    (48, 80),  # /
+]
+
+# Filter types
+FILTER_INVERT = 0
+FILTER_GRAYSCALE = 1
+FILTER_FLIP_X = 2
+FILTER_FLIP_Y = 3
+FILTER_ROTATE_90 = 4
+FILTER_WAVE = 5
+FILTER_PIXELATE = 6
+FILTER_BLUR = 7
+
+# Filter icons (x, y) coordinates in resource file
+# For now they are placeholders until proper icons are added
+FILTER_ICONS = [
+    (0, 16),  # Invert
+    (0, 16),  # Grayscale
+    (0, 16),  # Flip X
+    (0, 16),  # Flip Y
+    (0, 16),  # Rotate 90
+    (0, 16),  # Wave
+    (0, 16),  # Pixelate
+    (0, 16),  # Blur
+]
+
 
 class BunnyPyx:
     def __init__(self):
@@ -113,6 +199,14 @@ class BunnyPyx:
         self.num_algo_brushes = len(ALGO_BRUSH_ICONS)
         self.algo_brush_angle = 0  # For rotating brushes
         self.algo_brush_step = 0   # For incremental patterns
+        
+        # Initialize type tool
+        self.current_char = 0
+        self.num_chars = len(CHARS)
+        
+        # Initialize filter tool
+        self.current_filter = 0
+        self.num_filters = len(FILTER_ICONS)
         
         # Create a second image for the canvas
         pyxel.image(1).cls(0)
@@ -156,6 +250,35 @@ class BunnyPyx:
                         brush_idx = (pyxel.mouse_x - 16) // 16
                         if 0 <= brush_idx < self.num_algo_brushes:  # Only select valid brushes
                             self.current_algo_brush = brush_idx
+                elif self.current_tool == TOOL_TYPE:
+                    # Character selection mode
+                    # Left arrow button (first position)
+                    if 0 <= pyxel.mouse_x < 16:
+                        self.current_char = (self.current_char - 1) % self.num_chars
+                    # Right arrow button (last position)
+                    elif 240 <= pyxel.mouse_x < 256:
+                        self.current_char = (self.current_char + 1) % self.num_chars
+                    # Character selection (positions 1-14)
+                    else:
+                        char_idx = (pyxel.mouse_x - 16) // 16
+                        if 0 <= char_idx < 14:  # Only 14 visible chars at once
+                            # Calculate the actual index based on potential multiple pages
+                            actual_idx = char_idx
+                            if actual_idx < self.num_chars:
+                                self.current_char = actual_idx
+                elif self.current_tool == TOOL_FILTER:
+                    # Filter selection mode
+                    # Left arrow button (first position)
+                    if 0 <= pyxel.mouse_x < 16:
+                        self.current_filter = (self.current_filter - 1) % self.num_filters
+                    # Right arrow button (last position)
+                    elif 240 <= pyxel.mouse_x < 256:
+                        self.current_filter = (self.current_filter + 1) % self.num_filters
+                    # Filter selection (positions 1-14)
+                    else:
+                        filter_idx = (pyxel.mouse_x - 16) // 16
+                        if 0 <= filter_idx < self.num_filters:
+                            self.current_filter = filter_idx
                 else:
                     # Color selection mode
                     # Left arrow button (first position)
@@ -200,7 +323,7 @@ class BunnyPyx:
                 self.drawing = True
                 self.start_x = pyxel.mouse_x
                 self.start_y = pyxel.mouse_y
-
+                
                 # For pencil and brush, draw immediately
                 if self.current_tool in (TOOL_PENCIL, TOOL_BRUSH, TOOL_ERASER):
                     self.draw_point(pyxel.mouse_x, pyxel.mouse_y)
@@ -216,6 +339,14 @@ class BunnyPyx:
                 # Algorithmic brush - apply immediately
                 elif self.current_tool == TOOL_ALGO_BRUSH:
                     self.apply_algo_brush(pyxel.mouse_x, pyxel.mouse_y)
+                
+                # Type tool - place character immediately
+                elif self.current_tool == TOOL_TYPE:
+                    self.place_char(pyxel.mouse_x, pyxel.mouse_y)
+                
+                # Filter tool - apply filter immediately
+                elif self.current_tool == TOOL_FILTER:
+                    self.apply_filter(pyxel.mouse_x, pyxel.mouse_y)
             
             # Continue drawing
             elif pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.drawing:
@@ -253,6 +384,11 @@ class BunnyPyx:
                 elif self.current_tool == TOOL_ALGO_BRUSH:
                     # Apply algorithmic brush with each movement
                     self.apply_algo_brush(pyxel.mouse_x, pyxel.mouse_y)
+                elif self.current_tool == TOOL_TYPE:
+                    # Allow continuous character placement while dragging, with delay
+                    if pyxel.frame_count % 6 == 0:  # Slightly slower than stamps
+                        self.place_char(pyxel.mouse_x, pyxel.mouse_y)
+                # Note: Filter tool only applies on initial click, not during drag
             
             # End drawing
             elif pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT) and self.drawing:
@@ -313,6 +449,220 @@ class BunnyPyx:
 
         # Copy the stamp to the canvas with transparency (color 0)
         pyxel.image(1).blt(dest_x, dest_y, 0, sx, sy, 16, 16, 0)
+    
+    def place_char(self, x, y):
+        # Get character coordinates
+        sx, sy = CHARS[self.current_char]
+
+        # Center the character on the mouse position
+        dest_x = x - 8
+        dest_y = y - 8
+
+        # Copy the character to the canvas with transparency (color 0)
+        pyxel.image(1).blt(dest_x, dest_y, 0, sx, sy, 16, 16, 0)
+    
+    def apply_filter(self, x, y):
+        # Apply the selected filter to the entire canvas
+        if self.current_filter == FILTER_INVERT:
+            self.filter_invert()
+        elif self.current_filter == FILTER_GRAYSCALE:
+            self.filter_grayscale()
+        elif self.current_filter == FILTER_FLIP_X:
+            self.filter_flip_x()
+        elif self.current_filter == FILTER_FLIP_Y:
+            self.filter_flip_y()
+        elif self.current_filter == FILTER_ROTATE_90:
+            self.filter_rotate_90()
+        elif self.current_filter == FILTER_WAVE:
+            self.filter_wave()
+        elif self.current_filter == FILTER_PIXELATE:
+            self.filter_pixelate()
+        elif self.current_filter == FILTER_BLUR:
+            self.filter_blur()
+    
+    def filter_invert(self):
+        # Create a temporary image to store the inverted result
+        temp_img = pyxel.Image(CANVAS_WIDTH, CANVAS_HEIGHT)
+        
+        # Invert each pixel color
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                col = pyxel.image(1).pget(x, y)
+                if col != 0:  # Don't invert transparent pixels
+                    # Simple inversion - this could be improved with a proper color map
+                    temp_img.pset(x, y, 15 - col)
+                else:
+                    temp_img.pset(x, y, 0)
+        
+        # Copy the result back to the canvas
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                pyxel.image(1).pset(x, y, temp_img.pget(x, y))
+    
+    def filter_grayscale(self):
+        # Create a grayscale mapping for the Pyxel color palette
+        # This is a simplified mapping - could be improved with actual luminance values
+        gray_map = [0, 5, 5, 6, 5, 5, 6, 7, 5, 6, 5, 6, 6, 7, 13, 7]
+        
+        # Apply grayscale to each pixel
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                col = pyxel.image(1).pget(x, y)
+                if col != 0:  # Don't convert transparent pixels
+                    pyxel.image(1).pset(x, y, gray_map[col])
+    
+    def filter_flip_x(self):
+        # Create a temporary image to store the flipped result
+        temp_img = pyxel.Image(CANVAS_WIDTH, CANVAS_HEIGHT)
+        
+        # Copy pixels in horizontally flipped order
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                temp_img.pset(CANVAS_WIDTH - 1 - x, y, pyxel.image(1).pget(x, y))
+        
+        # Copy the result back to the canvas
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                pyxel.image(1).pset(x, y, temp_img.pget(x, y))
+    
+    def filter_flip_y(self):
+        # Create a temporary image to store the flipped result
+        temp_img = pyxel.Image(CANVAS_WIDTH, CANVAS_HEIGHT)
+        
+        # Copy pixels in vertically flipped order
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                temp_img.pset(x, CANVAS_HEIGHT - 1 - y, pyxel.image(1).pget(x, y))
+        
+        # Copy the result back to the canvas
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                pyxel.image(1).pset(x, y, temp_img.pget(x, y))
+    
+    def filter_rotate_90(self):
+        # Create a temporary image to store the rotated result
+        temp_img = pyxel.Image(CANVAS_HEIGHT, CANVAS_WIDTH)  # Note the swapped dimensions
+        
+        # Copy pixels in rotated order (90 degrees clockwise)
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                temp_img.pset(CANVAS_HEIGHT - 1 - y, x, pyxel.image(1).pget(x, y))
+        
+        # The rotated image might be larger than our canvas due to aspect ratio
+        # We'll center it and crop to fit
+        offset_x = (CANVAS_WIDTH - CANVAS_HEIGHT) // 2
+        offset_y = (CANVAS_HEIGHT - CANVAS_WIDTH) // 2
+        
+        # Clear the original image
+        pyxel.image(1).cls(0)
+        
+        # Copy the rotated content back, centered
+        for y in range(min(CANVAS_WIDTH, CANVAS_HEIGHT)):
+            for x in range(min(CANVAS_WIDTH, CANVAS_HEIGHT)):
+                if 0 <= x + offset_x < CANVAS_WIDTH and 0 <= y + offset_y < CANVAS_HEIGHT:
+                    pyxel.image(1).pset(x + offset_x, y + offset_y, temp_img.pget(x, y))
+    
+    def filter_wave(self):
+        # Create a temporary image to store the wave result
+        temp_img = pyxel.Image(CANVAS_WIDTH, CANVAS_HEIGHT)
+        
+        # Copy the original image to the temporary image
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                temp_img.pset(x, y, pyxel.image(1).pget(x, y))
+        
+        # Apply a sine wave distortion to the vertical position
+        amplitude = 4  # Wave amplitude
+        frequency = 0.05  # Wave frequency
+        
+        # Clear the original image
+        pyxel.image(1).cls(0)
+        
+        # Apply the wave effect
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                # Calculate the wave offset for this column
+                offset = int(amplitude * pyxel.sin(x * frequency * 360))
+                
+                # Get y position with wave effect (and wrap around)
+                wave_y = (y + offset) % CANVAS_HEIGHT
+                
+                # Copy the pixel with the wave effect applied
+                pyxel.image(1).pset(x, y, temp_img.pget(x, wave_y))
+    
+    def filter_pixelate(self):
+        # Create a temporary image to store the original
+        temp_img = pyxel.Image(CANVAS_WIDTH, CANVAS_HEIGHT)
+        
+        # Copy the original image to the temporary image
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                temp_img.pset(x, y, pyxel.image(1).pget(x, y))
+        
+        # Pixelation block size
+        block_size = 4
+        
+        # Apply pixelation effect
+        for block_y in range(0, CANVAS_HEIGHT, block_size):
+            for block_x in range(0, CANVAS_WIDTH, block_size):
+                # Determine the dominant color in this block
+                colors = {}
+                for y in range(block_size):
+                    for x in range(block_size):
+                        px = block_x + x
+                        py = block_y + y
+                        if px < CANVAS_WIDTH and py < CANVAS_HEIGHT:
+                            color = temp_img.pget(px, py)
+                            if color != 0:  # Ignore transparent pixels
+                                colors[color] = colors.get(color, 0) + 1
+                
+                # Find the most common color
+                dominant_color = 0
+                if colors:
+                    dominant_color = max(colors, key=colors.get)
+                
+                # Set the entire block to the dominant color
+                for y in range(block_size):
+                    for x in range(block_size):
+                        px = block_x + x
+                        py = block_y + y
+                        if px < CANVAS_WIDTH and py < CANVAS_HEIGHT:
+                            if temp_img.pget(px, py) != 0:  # Only change non-transparent pixels
+                                pyxel.image(1).pset(px, py, dominant_color)
+    
+    def filter_blur(self):
+        # Create a temporary image to store the original
+        temp_img = pyxel.Image(CANVAS_WIDTH, CANVAS_HEIGHT)
+        
+        # Copy the original image to the temporary image
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                temp_img.pset(x, y, pyxel.image(1).pget(x, y))
+        
+        # Apply a simple box blur
+        kernel_size = 3
+        half_kernel = kernel_size // 2
+        
+        for y in range(CANVAS_HEIGHT):
+            for x in range(CANVAS_WIDTH):
+                # Skip transparent pixels
+                if temp_img.pget(x, y) == 0:
+                    continue
+                
+                # Count colors in the kernel
+                colors = {}
+                for ky in range(-half_kernel, half_kernel + 1):
+                    for kx in range(-half_kernel, half_kernel + 1):
+                        nx, ny = x + kx, y + ky
+                        if 0 <= nx < CANVAS_WIDTH and 0 <= ny < CANVAS_HEIGHT:
+                            col = temp_img.pget(nx, ny)
+                            if col != 0:  # Ignore transparent pixels
+                                colors[col] = colors.get(col, 0) + 1
+                
+                # Find the average color (or most common)
+                if colors:
+                    avg_color = max(colors, key=colors.get)
+                    pyxel.image(1).pset(x, y, avg_color)
 
     def apply_algo_brush(self, x, y):
         # Apply the selected algorithmic brush pattern
@@ -559,6 +909,10 @@ class BunnyPyx:
             self.draw_stamp_palette(toolbar_y + 16)
         elif self.current_tool == TOOL_ALGO_BRUSH:
             self.draw_algo_brush_palette(toolbar_y + 16)
+        elif self.current_tool == TOOL_TYPE:
+            self.draw_type_palette(toolbar_y + 16)
+        elif self.current_tool == TOOL_FILTER:
+            self.draw_filter_palette(toolbar_y + 16)
         else:
             self.draw_color_palette(toolbar_y + 16)
 
@@ -595,6 +949,12 @@ class BunnyPyx:
             elif self.current_tool == TOOL_ALGO_BRUSH:
                 # Show a preview of the algorithmic brush effect
                 self.draw_algo_brush_preview(pyxel.mouse_x, pyxel.mouse_y)
+            elif self.current_tool == TOOL_TYPE:
+                # Show a preview of the selected character
+                self.draw_char_preview(pyxel.mouse_x, pyxel.mouse_y)
+            elif self.current_tool == TOOL_FILTER:
+                # Show a preview of the selected filter effect
+                self.draw_filter_preview(pyxel.mouse_x, pyxel.mouse_y)
 
     def draw_color_palette(self, y):
         # Draw left arrow button using icon
@@ -730,6 +1090,101 @@ class BunnyPyx:
                 ny = y + pyxel.sin(i * 0.6 + self.algo_brush_angle * 0.1) * 3
                 pyxel.line(px, py, nx, ny, 7)
                 px, py = nx, ny
+
+    def draw_type_palette(self, y):
+        # Draw left arrow button using icon
+        pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
+
+        # Draw right arrow button using icon
+        pyxel.blt(240, y, 0, 208, 0, 16, 16, 0)  # Right arrow icon at (208,0)
+
+        # Draw character palette (14 characters between the arrows)
+        for i in range(14):
+            char_idx = i
+            if char_idx < len(CHARS):
+                x = 16 + i * 16
+                sx, sy = CHARS[char_idx]
+
+                # Draw white outline only if selected, no outline for unselected characters
+                if char_idx == self.current_char:
+                    pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
+
+                # Draw character
+                pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
+
+    def draw_filter_palette(self, y):
+        # Draw left arrow button using icon
+        pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
+
+        # Draw right arrow button using icon
+        pyxel.blt(240, y, 0, 208, 0, 16, 16, 0)  # Right arrow icon at (208,0)
+
+        # Draw filter icons between the arrows
+        for i in range(min(14, self.num_filters)):
+            x = 16 + i * 16
+            
+            # For now, we're using temporary icons from the same resource file
+            sx, sy = FILTER_ICONS[i]
+
+            # Draw white outline only if selected, no outline for unselected filters
+            if i == self.current_filter:
+                pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
+
+            # Draw filter icon
+            pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
+            
+            # If no icon available, draw a placeholder with text
+            if i >= len(FILTER_ICONS):
+                pyxel.rect(x + 2, y + 2, 12, 12, 5)  # Gray background
+                pyxel.text(x + 4, y + 5, "F" + str(i), 7)  # White text
+    
+    def draw_char_preview(self, x, y):
+        # Show a simplified preview of the selected character
+        sx, sy = CHARS[self.current_char]
+        pyxel.blt(x - 8, y - 8, 0, sx, sy, 16, 16, 0)
+
+    def draw_filter_preview(self, x, y):
+        # Show a simplified preview of the selected filter effect
+        if self.current_filter == FILTER_INVERT:
+            # Show inverted preview
+            pyxel.circb(x, y, 5, 7)
+            pyxel.circb(x+3, y-2, 3, 8)
+            pyxel.circ(x-4, y+2, 2, 11)
+        elif self.current_filter == FILTER_GRAYSCALE:
+            # Show grayscale preview
+            pyxel.rectb(x-5, y-5, 11, 11, 7)
+            pyxel.rectb(x-3, y-3, 7, 7, 8)
+            pyxel.rectb(x-1, y-1, 3, 3, 10)
+        elif self.current_filter == FILTER_FLIP_X:
+            # Show flipped horizontally preview
+            pyxel.circb(x, y, 5, 7)
+            pyxel.circb(x+3, y-2, 3, 8)
+            pyxel.circ(x-4, y+2, 2, 11)
+        elif self.current_filter == FILTER_FLIP_Y:
+            # Show flipped vertically preview
+            pyxel.circb(x, y, 5, 7)
+            pyxel.circb(x+3, y-2, 3, 8)
+            pyxel.circ(x-4, y+2, 2, 11)
+        elif self.current_filter == FILTER_ROTATE_90:
+            # Show rotated 90 degrees preview
+            pyxel.circb(x, y, 5, 7)
+            pyxel.circb(x+3, y-2, 3, 8)
+            pyxel.circ(x-4, y+2, 2, 11)
+        elif self.current_filter == FILTER_WAVE:
+            # Show wave preview
+            pyxel.circb(x, y, 5, 7)
+            pyxel.circb(x+3, y-2, 3, 8)
+            pyxel.circ(x-4, y+2, 2, 11)
+        elif self.current_filter == FILTER_PIXELATE:
+            # Show pixelated preview
+            pyxel.rectb(x-5, y-5, 11, 11, 7)
+            pyxel.rectb(x-3, y-3, 7, 7, 8)
+            pyxel.rectb(x-1, y-1, 3, 3, 10)
+        elif self.current_filter == FILTER_BLUR:
+            # Show blurred preview
+            pyxel.rectb(x-5, y-5, 11, 11, 7)
+            pyxel.rectb(x-3, y-3, 7, 7, 8)
+            pyxel.rectb(x-1, y-1, 3, 3, 10)
 
 
 BunnyPyx()
