@@ -41,20 +41,20 @@ COLOR_PALETTES = [
 # Stamp images
 # Array of (x, y) coordinates for the stamps in the resource file
 STAMPS = [
-    (0, 0),  # Pencil icon
-    (16, 0),  # Brush icon
-    (32, 0),  # Eraser icon
-    (48, 0),  # Fill icon
-    (64, 0),  # Line icon
-    (80, 0),  # Rectangle icon
-    (96, 0),  # Circle icon
+    (0, 0),    # Pencil icon
+    (16, 0),   # Brush icon
+    (32, 0),   # Eraser icon
+    (48, 0),   # Fill icon
+    (64, 0),   # Line icon
+    (80, 0),   # Rectangle icon
+    (96, 0),   # Circle icon
     (112, 0),  # Clear icon
     (128, 0),  # Stamp icon
     (144, 0),  # Will be additional stamps
-    (160, 0),
-    (176, 0),
-    (192, 0),
-    (208, 0),
+    (160, 0),  # TODO
+    (176, 0),  # TODO
+    (192, 0),  # TODO
+    (208, 0),  # TODO
 ]
 
 
@@ -66,7 +66,7 @@ class BunnyPyx:
 
         # Initialize canvas
         self.current_tool = TOOL_PENCIL
-        self.current_color = 7  # White
+        self.current_color = 7  # White3333
         self.current_size = 1
         self.old_x = 0
         self.old_y = 0
