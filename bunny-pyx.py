@@ -327,6 +327,9 @@ class BunnyPyx:
                 # For pencil and brush, draw immediately
                 if self.current_tool in (TOOL_PENCIL, TOOL_BRUSH, TOOL_ERASER):
                     self.draw_point(pyxel.mouse_x, pyxel.mouse_y)
+                    # Play sound 1 for pencil tool
+                    if self.current_tool == TOOL_PENCIL:
+                        pyxel.play(0, 1)  # Play sound 1 on channel 0
                 
                 # Fill bucket tool
                 elif self.current_tool == TOOL_FILL:
@@ -377,6 +380,10 @@ class BunnyPyx:
                                         pyxel.mouse_y + dy,
                                         color,
                                     )
+                    
+                    # Play sound for pencil tool, but not continuously - only every few frames
+                    if self.current_tool == TOOL_PENCIL and pyxel.frame_count % 6 == 0:
+                        pyxel.play(0, 1)  # Play sound 1 on channel 0
                 elif self.current_tool == TOOL_STAMP:
                     # Allow continuous stamping while dragging, with minimal delay
                     if pyxel.frame_count % 2 == 0:  # Reduced from 8 to 2 frames
@@ -449,6 +456,9 @@ class BunnyPyx:
 
         # Copy the stamp to the canvas with transparency (color 0)
         pyxel.image(1).blt(dest_x, dest_y, 0, sx, sy, 16, 16, 0)
+        
+        # Play sound effect when stamping
+        pyxel.play(0, 0)  # Play sound 0 on channel 0
     
     def place_char(self, x, y):
         # Get character coordinates
@@ -460,6 +470,9 @@ class BunnyPyx:
 
         # Copy the character to the canvas with transparency (color 0)
         pyxel.image(1).blt(dest_x, dest_y, 0, sx, sy, 16, 16, 0)
+        
+        # Play sound effect when placing a character
+        pyxel.play(0, 0)  # Play sound 0 on channel 0
     
     def apply_filter(self, x, y):
         # Apply the selected filter to the entire canvas
@@ -479,6 +492,9 @@ class BunnyPyx:
             self.filter_pixelate()
         elif self.current_filter == FILTER_BLUR:
             self.filter_blur()
+            
+        # Play sound when a filter is applied
+        pyxel.play(0, 2)  # Play sound 2 on channel 0
     
     def filter_invert(self):
         # Create a temporary image to store the inverted result
