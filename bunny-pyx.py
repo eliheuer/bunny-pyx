@@ -885,9 +885,9 @@ class BunnyPyx:
             x = i * 16
             y = toolbar_y
 
-            # Highlight selected tool with 15x15 indicator
+            # Highlight selected tool with yellow background
             if i == self.current_tool:
-                pyxel.rectb(x + 1, y + 1, 14, 14, 7)
+                pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
             # Draw the icon from sprite sheet (image 0)
             pyxel.blt(x, y, 0, i * 16, 0, 16, 16, 0)
@@ -902,10 +902,9 @@ class BunnyPyx:
             center_x = x + 8
             center_y = y + 8
 
-            # Only highlight the selected size with 15x15 indicator
+            # Highlight selected size with yellow background
             if size == self.current_size:
-                # Draw selection box (15x15)
-                pyxel.rectb(x + 1, y + 1, 14, 14, 7)
+                pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
             # Make sure circles are perfectly centered within the 15x15 selection box
             # For a circle with radius r, the diameter is 2r+1 pixels
@@ -990,12 +989,15 @@ class BunnyPyx:
         for i, color in enumerate(colors):
             x = 16 + i * 16
 
-            # Draw border (black by default, white if selected)
-            outline_color = 7 if color == self.current_color else 0
-            pyxel.rectb(x + 1, y + 1, 14, 14, outline_color)
+            # Draw yellow background for selected color
+            if color == self.current_color:
+                pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
-            # Draw color sample (14x14)
+            # Draw color sample (fill the space but leave room for outline)
             pyxel.rect(x + 2, y + 2, 12, 12, color)
+            
+            # Draw black outline around all colors
+            pyxel.rectb(x + 1, y + 1, 14, 14, 0)
 
     def draw_stamp_palette(self, y):
         # Draw left arrow button using icon
@@ -1011,13 +1013,13 @@ class BunnyPyx:
                 x = 16 + i * 16
                 sx, sy = STAMPS[stamp_idx]
 
-                # Draw white outline only if selected, no outline for unselected stamps
+                # Draw yellow background for selected stamp
                 if stamp_idx == self.current_stamp:
-                    pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
+                    pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
                 # Draw stamp
-                pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
-
+                pyxel.blt(x, y, 0, sx, sy, 16, 16, 0)
+    
     def draw_algo_brush_palette(self, y):
         # Draw left arrow button using icon
         pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
@@ -1032,12 +1034,12 @@ class BunnyPyx:
             # For now, we're using temporary icons from the same resource file
             sx, sy = ALGO_BRUSH_ICONS[i]
 
-            # Draw white outline only if selected, no outline for unselected brushes
+            # Draw yellow background for selected brush
             if i == self.current_algo_brush:
-                pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
+                pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
             # Draw brush icon
-            pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
+            pyxel.blt(x, y, 0, sx, sy, 16, 16, 0)
             
             # If no icon available, draw a placeholder with text
             if i >= len(ALGO_BRUSH_ICONS):
@@ -1106,7 +1108,7 @@ class BunnyPyx:
                 ny = y + pyxel.sin(i * 0.6 + self.algo_brush_angle * 0.1) * 3
                 pyxel.line(px, py, nx, ny, 7)
                 px, py = nx, ny
-
+    
     def draw_type_palette(self, y):
         # Draw left arrow button using icon
         pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
@@ -1121,12 +1123,12 @@ class BunnyPyx:
                 x = 16 + i * 16
                 sx, sy = CHARS[char_idx]
 
-                # Draw white outline only if selected, no outline for unselected characters
+                # Draw yellow background for selected character
                 if char_idx == self.current_char:
-                    pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
+                    pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
                 # Draw character
-                pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
+                pyxel.blt(x, y, 0, sx, sy, 16, 16, 0)
 
     def draw_filter_palette(self, y):
         # Draw left arrow button using icon
@@ -1142,12 +1144,12 @@ class BunnyPyx:
             # For now, we're using temporary icons from the same resource file
             sx, sy = FILTER_ICONS[i]
 
-            # Draw white outline only if selected, no outline for unselected filters
+            # Draw yellow background for selected filter
             if i == self.current_filter:
-                pyxel.rectb(x + 1, y + 1, 14, 14, 7)  # White outline for selected
+                pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
             # Draw filter icon
-            pyxel.blt(x + 1, y + 1, 0, sx, sy, 14, 14, 0)
+            pyxel.blt(x, y, 0, sx, sy, 16, 16, 0)
             
             # If no icon available, draw a placeholder with text
             if i >= len(FILTER_ICONS):
