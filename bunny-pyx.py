@@ -71,13 +71,13 @@ ALGO_WAVES = 7
 # Algorithmic brush icons (x, y) coordinates in resource file
 # For now they are placeholders until proper icons are added
 ALGO_BRUSH_ICONS = [
-    (144, 0),  # Random Circles
-    (160, 0),  # Rotating Lines
-    (176, 0),  # Loops
-    (192, 0),  # Spirals
-    (208, 0),  # Squares
-    (224, 0),  # Stars
-    (240, 0),  # Confetti
+    (0, 16),  # Random Circles
+    (0, 16),  # Rotating Lines
+    (0, 16),  # Loops
+    (0, 16),  # Spirals
+    (0, 16),  # Squares
+    (0, 16),  # Stars
+    (0, 16),  # Confetti
     (0, 16),   # Waves
 ]
 
