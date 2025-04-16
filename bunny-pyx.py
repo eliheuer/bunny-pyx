@@ -1,22 +1,24 @@
 # Bunny Pyx
+# (\(\
+# ( -.-)
+# o_(")(")
 import pyxel
 
-# Woskspace constants
-CANVAS_WIDTH   = 256
-CANVAS_HEIGHT  = 128
+# Woskspace widths & heights
+CANVAS_WIDTH = 256
+CANVAS_HEIGHT = 128
 TOOLBAR_HEIGHT = 32
 
-
-# Tool constants
+# Tool numbers
 TOOL_PENCIL = 0
-TOOL_BRUSH  = 1
+TOOL_BRUSH = 1
 TOOL_ERASER = 2
-TOOL_FILL   = 3
-TOOL_LINE   = 4
-TOOL_RECT   = 5
+TOOL_FILL = 3
+TOOL_LINE = 4
+TOOL_RECT = 5
 TOOL_CIRCLE = 6
-TOOL_CLEAR  = 7
-TOOL_STAMP  = 8
+TOOL_CLEAR = 7
+TOOL_STAMP = 8
 
 # Number of tools in toolbar
 NUM_TOOLS = 9
@@ -24,14 +26,15 @@ NUM_TOOLS = 9
 # Brush sizes
 SIZES = [1, 3, 6, 12]
 
-# Color palette layers
-# Each layer has 14 colors (to leave room for navigation buttons)
+# Color palette layers.
+# Each layer has 14 colors,
+# to leave room for two navigation buttons.
 COLOR_PALETTES = [
     # Layer 1: Default Pyxel colors (minus the last two)
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     # Layer 2: Last two colors from layer 1 + rainbow colors
     [14, 15, 8, 9, 10, 11, 12, 3, 1, 2, 4, 5, 6, 7],
-    # Layer 3: Grayscale (using default Pyxel colors for now)
+    # Layer 3: Grayscale
     [0, 0, 5, 5, 6, 6, 7, 7, 7, 6, 6, 5, 5, 0],
 ]
 
