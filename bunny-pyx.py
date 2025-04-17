@@ -53,20 +53,13 @@ COLOR_PALETTES = [
 # Stamp images
 # Array of (x, y) coordinates for the stamps in the resource file
 STAMPS = [
-    (0, 0),    # Pencil icon
-    (16, 0),   # Brush icon
-    (32, 0),   # Eraser icon
-    (48, 0),   # Fill icon
-    (64, 0),   # Line icon
-    (80, 0),   # Rectangle icon
-    (96, 0),   # Circle icon
-    (112, 0),  # Clear icon
-    (128, 0),  # Stamp icon
-    (144, 0),  # Algo brush icon
-    (160, 0),  # TODO
-    (176, 0),  # TODO
-    (192, 0),  # TODO
-    (208, 0),  # TODO
+    (0, 240),
+    (16, 240),
+    (32, 240),
+    (48, 240),
+    (64, 240),
+    (80, 240),
+    (96, 240),
 ]
 
 # Algorithmic brush types
@@ -1019,8 +1012,8 @@ class BunnyPyx:
             # Draw color sample (fill the space but leave room for outline)
             pyxel.rect(x + 2, y + 2, 12, 12, color)
             
-            # Draw black outline around all colors
-            pyxel.rectb(x + 1, y + 1, 14, 14, 0)
+            # Draw dark blue outline around all colors
+            pyxel.rectb(x + 1, y + 1, 14, 14, 1)
 
     def draw_stamp_palette(self, y):
         # Draw left arrow button using icon
