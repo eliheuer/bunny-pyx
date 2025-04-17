@@ -27,7 +27,16 @@ TOOL_FILTER = 11
 NUM_TOOLS = 12
 
 # Brush sizes
-SIZES = [1, 3, 6, 12]
+SIZES = [2, 4, 8, 14]
+
+# Brush size icons - coordinates in the resource file (image 0)
+# These should be created in the pyxres file with a purple center (color 2)
+BRUSH_SIZE_ICONS = [
+    (0, 32),   # Small brush icon
+    (16, 32),  # Medium brush icon
+    (32, 32),  # Large brush icon
+    (48, 32),  # Extra large brush icon
+]
 
 # Color palette layers.
 # Each layer has 14 colors,
@@ -442,9 +451,13 @@ class BunnyPyx:
         )
 
         if self.current_tool == TOOL_BRUSH:
+            # Use the brush size as the diameter (radius = size/2)
             pyxel.image(1).circ(x, y, size // 2, color)
         else:
-            pyxel.image(1).rect(x - size // 2, y - size // 2, size, size, color)
+            # For other tools like pencil, center the square properly
+            # For even-numbered sizes, we need to offset by size/2
+            offset = size // 2
+            pyxel.image(1).rect(x - offset, y - offset, size, size, color)
 
     def stamp_image(self, x, y):
         # Get stamp coordinates
@@ -906,18 +919,28 @@ class BunnyPyx:
             if size == self.current_size:
                 pyxel.rect(x, y, 16, 16, 10)  # Yellow background
 
-            # Make sure circles are perfectly centered within the 15x15 selection box
-            # For a circle with radius r, the diameter is 2r+1 pixels
-            # The selection box is 15x15, so the max diameter should be 13 (leaving 1px on each side)
-            # Therefore max radius is 6 (for a 13 pixel diameter)
-            display_sizes = [1, 2, 4, 6]  # Adjusted for perfect centering
-            display_size = display_sizes[i]
-
-            # Draw filled circle with current color (perfectly centered)
-            pyxel.circ(center_x, center_y, display_size, self.current_color)
-
-            # Draw black outline around the circle
-            pyxel.circb(center_x, center_y, display_size, 0)
+            # Get the brush size icon based on index
+            sx, sy = BRUSH_SIZE_ICONS[i]
+            
+            # Draw the brush size icon with color replacement
+            # This replaces color 2 (purple) with the current color
+            # The last parameter is the color key for transparency (0)
+            # Color 2 is explicitly not included in the color key to allow it to be replaced
+            colkey = 0  # Only color 0 is transparent
+            
+            # First draw the icon without the purple parts
+            for dy in range(16):
+                for dx in range(16):
+                    pixel_color = pyxel.image(0).pget(sx + dx, sy + dy)
+                    if pixel_color != 0 and pixel_color != 2:  # Not transparent or purple
+                        pyxel.pset(x + dx, y + dy, pixel_color)
+            
+            # Then draw the purple parts with the current color
+            for dy in range(16):
+                for dx in range(16):
+                    pixel_color = pyxel.image(0).pget(sx + dx, sy + dy)
+                    if pixel_color == 2:  # Purple parts
+                        pyxel.pset(x + dx, y + dy, self.current_color)
 
         # Draw appropriate palette based on current tool
         if self.current_tool == TOOL_STAMP:
