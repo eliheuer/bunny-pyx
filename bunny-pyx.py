@@ -176,7 +176,7 @@ class BunnyPyx:
     def __init__(self):
         pyxel.init(256, 160, title="Bunny Pyx")
         pyxel.load("assets/bunny-pyx.pyxres")
-        pyxel.mouse(True)
+        pyxel.mouse(False)  # Hide the system mouse cursor
 
         # Initialize canvas
         self.current_tool = TOOL_PENCIL
@@ -987,6 +987,9 @@ class BunnyPyx:
                 # Show a preview of the selected filter effect
                 self.draw_filter_preview(pyxel.mouse_x, pyxel.mouse_y)
 
+        # Draw custom mouse cursor based on current tool
+        self.draw_custom_cursor(pyxel.mouse_x, pyxel.mouse_y)
+
     def draw_color_palette(self, y):
         # Draw left arrow button using icon
         pyxel.blt(0, y, 0, 192, 0, 16, 16, 0)  # Left arrow icon at (192,0)
@@ -1219,6 +1222,28 @@ class BunnyPyx:
             pyxel.rectb(x-5, y-5, 11, 11, 7)
             pyxel.rectb(x-3, y-3, 7, 7, 8)
             pyxel.rectb(x-1, y-1, 3, 3, 10)
+
+    def draw_custom_cursor(self, x, y):
+        # Use different cursors based on current tool
+        if self.current_tool == TOOL_STAMP:
+            # Show stamp preview at cursor position
+            sx, sy = STAMPS[self.current_stamp]
+            pyxel.blt(x - 8, y - 8, 0, sx, sy, 16, 16, 0)
+        elif self.current_tool == TOOL_TYPE:
+            # Show character preview
+            sx, sy = CHARS[self.current_char]
+            pyxel.blt(x - 8, y - 8, 0, sx, sy, 16, 16, 0)
+        elif self.current_tool in (TOOL_PENCIL, TOOL_BRUSH, TOOL_ERASER):
+            # For pencil, brush and eraser, position the hotspot at lower-left corner
+            tool_x = self.current_tool * 16
+            # Place the icon so its lower-left corner is at the mouse position
+            # With a one pixel adjustment upward
+            pyxel.blt(x, y - 15, 0, tool_x, 0, 16, 16, 0)
+        else:
+            # For other tools, use the tool icon as cursor centered at mouse position
+            tool_x = self.current_tool * 16
+            # Draw the tool icon with a slight offset so the click point is in the center
+            pyxel.blt(x - 8, y - 8, 0, tool_x, 0, 16, 16, 0)
 
 
 BunnyPyx()
