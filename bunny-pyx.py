@@ -305,6 +305,9 @@ class BunnyPyx:
             elif pyxel.mouse_y > toolbar_y and pyxel.mouse_y < toolbar_y + 16:
                 col = pyxel.mouse_x // 16
                 if 0 <= col < NUM_TOOLS:
+                    # Play sound when changing tools
+                    if self.current_tool != col:
+                        pyxel.play(0, 4)  # Play sound 4 on channel 0
                     self.current_tool = col
 
                 # Size selection (right side)
@@ -329,13 +332,13 @@ class BunnyPyx:
                 # For pencil and brush, draw immediately
                 if self.current_tool in (TOOL_PENCIL, TOOL_BRUSH, TOOL_ERASER):
                     self.draw_point(pyxel.mouse_x, pyxel.mouse_y)
-                    # Play sound 1 for pencil tool
                     if self.current_tool == TOOL_PENCIL:
-                        pyxel.play(0, 1)  # Play sound 1 on channel 0
+                        pyxel.play(0, 0)  # Play sound 1 on channel 0
                 
                 # Fill bucket tool
                 elif self.current_tool == TOOL_FILL:
                     pyxel.image(1).cls(self.current_color)
+                    pyxel.play(0, 0)  # Play sound 1 on channel 0
                 
                 # Stamp tool - stamp immediately
                 elif self.current_tool == TOOL_STAMP:
