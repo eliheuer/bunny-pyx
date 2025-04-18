@@ -1229,24 +1229,18 @@ class BunnyPyx:
     def draw_custom_cursor(self, x, y):
         # Use different cursors based on current tool
         if self.current_tool == TOOL_STAMP:
-            # Show stamp preview at cursor position
+            # Show stamp preview at cursor position with center hotspot
             sx, sy = STAMPS[self.current_stamp]
             pyxel.blt(x - 8, y - 8, 0, sx, sy, 16, 16, 0)
         elif self.current_tool == TOOL_TYPE:
-            # Show character preview
+            # Show character preview with lower-left hotspot
             sx, sy = CHARS[self.current_char]
-            pyxel.blt(x - 8, y - 8, 0, sx, sy, 16, 16, 0)
-        elif self.current_tool in (TOOL_PENCIL, TOOL_BRUSH, TOOL_ERASER):
-            # For pencil, brush and eraser, position the hotspot at lower-left corner
+            pyxel.blt(x, y - 15, 0, sx, sy, 16, 16, 0)
+        else:
+            # For all other tools, position hotspot at lower-left corner
             tool_x = self.current_tool * 16
             # Place the icon so its lower-left corner is at the mouse position
-            # With a one pixel adjustment upward
             pyxel.blt(x, y - 15, 0, tool_x, 0, 16, 16, 0)
-        else:
-            # For other tools, use the tool icon as cursor centered at mouse position
-            tool_x = self.current_tool * 16
-            # Draw the tool icon with a slight offset so the click point is in the center
-            pyxel.blt(x - 8, y - 8, 0, tool_x, 0, 16, 16, 0)
 
 
 BunnyPyx()
